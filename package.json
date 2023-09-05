@@ -6,12 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "dev": "yarn build && yarn start"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^20.5.9",
     "typescript": "^5.2.2"
   },
   "types": "dist/index.d.ts",
@@ -21,5 +23,9 @@
     "LICENSE",
     "README.md",
     "package.json"
-  ]
+  ],
+  "dependencies": {
+    "axios": "^1.5.0",
+    "node-fetch": "^3.3.2"
+  }
 }
