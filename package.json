@@ -1,12 +1,11 @@
 {
   "name": "pi-access-sdk",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "This is a SDK for the PI Access API.",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node src",
     "dev": "yarn build && yarn start"
   },
   "keywords": [],
@@ -16,16 +15,12 @@
     "@types/node": "^20.5.9",
     "typescript": "^5.2.2"
   },
-  "types": "dist/index.d.ts",
-  "type": "module",
-  "files": [
-    "dist",
-    "LICENSE",
-    "README.md",
-    "package.json"
-  ],
   "dependencies": {
     "axios": "^1.5.0",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "files": [
+    "dist",
+    "@types"
+  ]
 }
