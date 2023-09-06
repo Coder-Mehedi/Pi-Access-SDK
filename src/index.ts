@@ -11,8 +11,8 @@ const sdkInitApi = async (sdkInitInput: SDKInitInput) => {
   try {
     const res = await api.post('/sdk-init', sdkInitInput);
     return res.data;
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    throw error.response.data;
   }
 };
 
@@ -20,8 +20,9 @@ const loginApi = async (loginInput: LoginInput) => {
   try {
     const res = await api.post('/auth/signin', loginInput);
     return res.data;
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    // console.log(error);
+    throw error.response.data;
   }
 };
 
@@ -52,18 +53,44 @@ const registerApi = async (registerInput: RegisterInput) => {
   }
 };
 
-type CommonInput = {
+const getOrganizationApi = async (
+  getOrganizationInput: GetOrganizationInput
+) => {
+  try {
+    const res = await api.post(
+      `/organization/${getOrganizationInput.organization_id}`,
+      getOrganizationInput
+    );
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getApplicationApi = async (getApplicationInput: GetApplicationInput) => {
+  try {
+    const res = await api.post(
+      `/application/${getApplicationInput.application_id}`,
+      getApplicationInput
+    );
+    return res.data;
+  } catch (error: any) {
+    return error.response.data;
+  }
+};
+
+export type CommonInput = {
   client_id: string;
   client_secret: string;
   application_id: string;
   organization_id: string;
 };
 
-type SDKInitInput = CommonInput & {
+export type SDKInitInput = CommonInput & {
   sdk_type: string;
 };
 
-type LoginInput = CommonInput & {
+export type LoginInput = CommonInput & {
   type: string;
   response_type: string;
   username: string;
@@ -75,7 +102,7 @@ type LoginInput = CommonInput & {
   country_code: string;
 };
 
-type RegisterInput = CommonInput &
+export type RegisterInput = CommonInput &
   Omit<LoginInput, 'response_type'> & {
     metadata: {
       [key: string]: any;
@@ -101,21 +128,25 @@ type RegisterInput = CommonInput &
     recovery_code: string;
   };
 
-type LogoutInput = CommonInput & {
+export type LogoutInput = CommonInput & {
   refresh_token: string;
 };
 
-type RefreshTokenInput = CommonInput & {
+export type RefreshTokenInput = CommonInput & {
   refresh_token: string;
   grant_type: string;
 };
 
-class Access {
+export type GetOrganizationInput = CommonInput & {};
+export type GetApplicationInput = CommonInput & {};
+
+export class Access {
   data: any;
 
   private static instance: Access | null = null;
 
   constructor(data: any) {
+    if (data.error) throw new Error(data.error.message);
     this.data = data;
     if (!Access.instance) {
       Access.instance = this;
@@ -125,8 +156,12 @@ class Access {
   }
 
   static async init(input: SDKInitInput): Promise<Access> {
-    const initRes = sdkInitApi(input);
-    return new Access({ ...initRes, ...input });
+    try {
+      const res = await sdkInitApi(input);
+      return new Access(res);
+    } catch (error: any) {
+      return new Access({ error });
+    }
   }
 
   async register(registerInput: RegisterInput) {
@@ -144,7 +179,17 @@ class Access {
   async refreshToken(refreshTokenInput: RefreshTokenInput) {
     return await refreshTokenApi(refreshTokenInput);
   }
+
+  async getOrganization(getOrganizationInput: GetOrganizationInput) {
+    return await getOrganizationApi(getOrganizationInput);
+  }
+
+  async getApplication(getApplicationInput: GetApplicationInput) {
+    return await getApplicationApi(getApplicationInput);
+  }
 }
+
+export default Access;
 
 const main = async () => {
   const commonInput = {
@@ -220,8 +265,8 @@ const main = async () => {
     recovery_code: '',
   };
 
-  const registerRes = await client.register(registerInput);
-  console.log(registerRes);
+  // const registerRes = await client.register(registerInput);
+  // console.log(registerRes);
 
   // const refreshTokenRes = await client.refreshToken(refreshTokenInput);
   // console.log(refreshTokenRes);
@@ -231,6 +276,12 @@ const main = async () => {
 
   // const loginRes = await client.login(loginInput);
   // console.log(loginRes);
+
+  // const getOrganizationRes = await client.getOrganization(commonInput);
+  // console.log(getOrganizationRes);
+
+  // const getApplicationRes = await client.getApplication(commonInput);
+  // console.log(getApplicationRes);
 
   // console.log(loginRes);
   // setTimeout(() => {
