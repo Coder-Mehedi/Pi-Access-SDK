@@ -1,146 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: process.env['ACCESS_SDK_URL'] || 'http://localhost:9111',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-const sdkInitApi = async (sdkInitInput: SDKInitInput) => {
-  try {
-    const res = await api.post('/sdk-init', sdkInitInput);
-    return res.data;
-  } catch (error: any) {
-    throw error.response.data;
-  }
-};
-
-const loginApi = async (loginInput: LoginInput) => {
-  const { session_option = '' } = loginInput;
-  try {
-    const res = await api.post('/auth/signin', {
-      ...loginInput,
-      session_option,
-    });
-    return res.data;
-  } catch (error: any) {
-    console.log(error);
-    // throw error.response.data;
-  }
-};
-
-const logoutApi = async (logoutInput: LogoutInput) => {
-  try {
-    const res = await api.post('/auth/signout', logoutInput);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const refreshTokenApi = async (refreshTokenInput: RefreshTokenInput) => {
-  try {
-    const res = await api.post('/auth/refresh', refreshTokenInput);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const registerApi = async (registerInput: RegisterInput) => {
-  try {
-    const res = await api.post('/auth/signup', registerInput);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const getUserApi = async (getUserInput: GetUserInput) => {
-  try {
-    const res = await api.post('/user', getUserInput);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const changePasswordApi = async (changePasswordInput: ChangePasswordInput) => {
-  try {
-    const res = await api.patch('/user/change-password', changePasswordInput);
-    return res.data;
-  } catch (error: any) {
-    console.log(error);
-    // throw error.response.data;
-  }
-};
-
-const forgetPasswordOTPSendApi = async (
-  forgetPasswordOTPSendInput: ForgetPasswordOTPSendInput
-) => {
-  try {
-    const res = await api.post(
-      '/forget-password/otp/send',
-      forgetPasswordOTPSendInput
-    );
-    return res.data;
-  } catch (error: any) {
-    console.log(error);
-    // throw error.response.data;
-  }
-};
-
-const forgetPasswordOTPVerifyApi = async (
-  forgetPasswordOTPVerifyInput: ForgetPasswordOTPVerifyInput
-) => {
-  try {
-    const res = await api.post(
-      '/forget-password/otp/verify',
-      forgetPasswordOTPVerifyInput
-    );
-    return res.data;
-  } catch (error: any) {
-    console.log(error);
-    // throw error.response.data;
-  }
-};
-
-const forgetPasswordApi = async (forgetPasswordInput: ForgetPasswordInput) => {
-  try {
-    const res = await api.post(`/forget-password`, forgetPasswordInput);
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const getOrganizationApi = async (
-  getOrganizationInput: GetOrganizationInput
-) => {
-  try {
-    const res = await api.post(
-      `/organization/${getOrganizationInput.organization_id}`,
-      getOrganizationInput
-    );
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const getApplicationApi = async (getApplicationInput: GetApplicationInput) => {
-  const { with_organization = false } = getApplicationInput;
-  try {
-    const res = await api.post(
-      `/application/${getApplicationInput.application_id}?with_organization=${with_organization}`,
-      getApplicationInput
-    );
-    return res.data;
-  } catch (error: any) {
-    return error.response.data;
-  }
-};
+import axios, { AxiosInstance } from 'axios';
 
 export type CommonInput = {
   client_id: string;
@@ -151,6 +9,7 @@ export type CommonInput = {
 
 export type SDKInitInput = CommonInput & {
   sdk_type: string;
+  url: string;
 };
 
 export type LoginInput = CommonInput & {
@@ -236,12 +95,14 @@ export type ForgetPasswordInput = CommonInput & {
 
 export class Access {
   data: any;
+  api: AxiosInstance;
 
   private static instance: Access | null = null;
 
-  constructor(data: any) {
+  constructor(data: any, api: AxiosInstance) {
     // if (data.error) throw new Error(data.error.message);
     this.data = data;
+    this.api = api;
     if (!Access.instance) {
       Access.instance = this;
     }
@@ -250,60 +111,146 @@ export class Access {
   }
 
   static async init(input: SDKInitInput): Promise<Access> {
+    const api = axios.create({
+      baseURL: input.url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
     try {
-      const res = await sdkInitApi(input);
-      return new Access(res);
+      const res = await api.post('/sdk-init', input);
+      return new Access(res.data, api);
     } catch (error: any) {
-      return new Access({ error });
+      return new Access({ error }, api);
     }
   }
 
   async register(registerInput: RegisterInput) {
-    return await registerApi(registerInput);
+    try {
+      const res = await this.api.post('/auth/signup', registerInput);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async login(loginInput: LoginInput) {
-    return await loginApi(loginInput);
+    const { session_option = '' } = loginInput;
+    try {
+      const res = await this.api.post('/auth/signin', {
+        ...loginInput,
+        session_option,
+      });
+      return res.data;
+    } catch (error: any) {
+      console.log(error);
+      // throw error.response.data;
+    }
   }
 
   async logout(logoutInput: LogoutInput) {
-    return await logoutApi(logoutInput);
+    try {
+      const res = await this.api.post('/auth/signout', logoutInput);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async refreshToken(refreshTokenInput: RefreshTokenInput) {
-    return await refreshTokenApi(refreshTokenInput);
+    try {
+      const res = await this.api.post('/auth/refresh', refreshTokenInput);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getOrganization(getOrganizationInput: GetOrganizationInput) {
-    return await getOrganizationApi(getOrganizationInput);
+    try {
+      const res = await this.api.post(
+        `/organization/${getOrganizationInput.organization_id}`,
+        getOrganizationInput
+      );
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getApplication(getApplicationInput: GetApplicationInput) {
-    return await getApplicationApi(getApplicationInput);
+    const { with_organization = false } = getApplicationInput;
+    try {
+      const res = await this.api.post(
+        `/application/${getApplicationInput.application_id}?with_organization=${with_organization}`,
+        getApplicationInput
+      );
+      return res.data;
+    } catch (error: any) {
+      return error.response.data;
+    }
   }
 
   async getUser(getUserInput: GetUserInput) {
-    return await getUserApi(getUserInput);
+    try {
+      const res = await this.api.post('/user', getUserInput);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async changePassword(changePasswordInput: ChangePasswordInput) {
-    return await changePasswordApi(changePasswordInput);
+    try {
+      const res = await this.api.patch(
+        '/user/change-password',
+        changePasswordInput
+      );
+      return res.data;
+    } catch (error: any) {
+      console.log(error);
+      // throw error.response.data;
+    }
   }
 
   async forgetPasswordOTPSend(
     forgetPasswordOTPSendInput: ForgetPasswordOTPSendInput
   ) {
-    return await forgetPasswordOTPSendApi(forgetPasswordOTPSendInput);
+    try {
+      const res = await this.api.post(
+        '/forget-password/otp/send',
+        forgetPasswordOTPSendInput
+      );
+      return res.data;
+    } catch (error: any) {
+      console.log(error);
+      // throw error.response.data;
+    }
   }
 
   async forgetPasswordOTPVerify(
     forgetPasswordOTPVerifyInput: ForgetPasswordOTPVerifyInput
   ) {
-    return await forgetPasswordOTPVerifyApi(forgetPasswordOTPVerifyInput);
+    try {
+      const res = await this.api.post(
+        '/forget-password/otp/verify',
+        forgetPasswordOTPVerifyInput
+      );
+      return res.data;
+    } catch (error: any) {
+      console.log(error);
+      // throw error.response.data;
+    }
   }
 
   async forgetPassword(forgetPasswordInput: ForgetPasswordInput) {
-    return await forgetPasswordApi(forgetPasswordInput);
+    try {
+      const res = await this.api.post(`/forget-password`, forgetPasswordInput);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
@@ -320,6 +267,7 @@ const main = async () => {
   const client = await Access.init({
     sdk_type: 'frontend',
     ...commonInput,
+    url: 'http://localhost:9111',
   });
 
   const loginInput: LoginInput = {
@@ -401,7 +349,7 @@ const main = async () => {
   //   user_id: '7696d850-369e-4d3f-b822-fd816f499f9f',
   //   sdk_type: 'frontend',
   // });
-  // console.log(getUserRes.data);
+  // console.log(getUserRes);
 
   // const changePasswordRes = await client.changePassword({
   //   ...commonInput,
@@ -429,15 +377,15 @@ const main = async () => {
   // });
   // console.log(forgetPasswordOTPVerifyRes);
 
-  const forgetPasswordRes = await client.forgetPassword({
-    ...commonInput,
-    sdk_type: 'frontend',
-    reference: 'T9LpYHeafIMi',
-    password_confirm: 'mehedi',
-    password: 'mehedi',
-  });
+  // const forgetPasswordRes = await client.forgetPassword({
+  //   ...commonInput,
+  //   sdk_type: 'frontend',
+  //   reference: 'T9LpYHeafIMi',
+  //   password_confirm: 'mehedi',
+  //   password: 'mehedi',
+  // });
 
-  console.log({ forgetPasswordRes });
+  // console.log({ forgetPasswordRes });
 
   // const getOrganizationRes = await client.getOrganization(commonInput);
   // console.log(getOrganizationRes);
