@@ -57,4 +57,6 @@ export type RefreshTokenInput = CommonInput & {
 };
 
 export type GetOrganizationInput = CommonInput & {};
-export type GetApplicationInput = CommonInput & {};
+export type GetApplicationInput = CommonInput & {
+  with_organization?: boolean;
+};

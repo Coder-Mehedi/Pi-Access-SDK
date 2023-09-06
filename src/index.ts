@@ -17,12 +17,16 @@ const sdkInitApi = async (sdkInitInput: SDKInitInput) => {
 };
 
 const loginApi = async (loginInput: LoginInput) => {
+  const { session_option = '' } = loginInput;
   try {
-    const res = await api.post('/auth/signin', loginInput);
+    const res = await api.post('/auth/signin', {
+      ...loginInput,
+      session_option,
+    });
     return res.data;
   } catch (error: any) {
-    // console.log(error);
-    throw error.response.data;
+    console.log(error);
+    // throw error.response.data;
   }
 };
 
@@ -53,6 +57,55 @@ const registerApi = async (registerInput: RegisterInput) => {
   }
 };
 
+const getUserApi = async (getUserInput: GetUserInput) => {
+  try {
+    const res = await api.post('/user', getUserInput);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const changePasswordApi = async (changePasswordInput: ChangePasswordInput) => {
+  try {
+    const res = await api.patch('/user/change-password', changePasswordInput);
+    return res.data;
+  } catch (error: any) {
+    console.log(error);
+    // throw error.response.data;
+  }
+};
+
+const forgetPasswordOTPSendApi = async (
+  forgetPasswordOTPSendInput: ForgetPasswordOTPSendInput
+) => {
+  try {
+    const res = await api.post(
+      '/forget-password/otp/send',
+      forgetPasswordOTPSendInput
+    );
+    return res.data;
+  } catch (error: any) {
+    console.log(error);
+    // throw error.response.data;
+  }
+};
+
+const forgetPasswordOTPVerifyApi = async (
+  forgetPasswordOTPVerifyInput: ForgetPasswordOTPVerifyInput
+) => {
+  try {
+    const res = await api.post(
+      '/forget-password/otp/verify',
+      forgetPasswordOTPVerifyInput
+    );
+    return res.data;
+  } catch (error: any) {
+    console.log(error);
+    // throw error.response.data;
+  }
+};
+
 const getOrganizationApi = async (
   getOrganizationInput: GetOrganizationInput
 ) => {
@@ -68,9 +121,10 @@ const getOrganizationApi = async (
 };
 
 const getApplicationApi = async (getApplicationInput: GetApplicationInput) => {
+  const { with_organization = false } = getApplicationInput;
   try {
     const res = await api.post(
-      `/application/${getApplicationInput.application_id}`,
+      `/application/${getApplicationInput.application_id}?with_organization=${with_organization}`,
       getApplicationInput
     );
     return res.data;
@@ -100,6 +154,7 @@ export type LoginInput = CommonInput & {
   region: string;
   redirect_uri: string;
   country_code: string;
+  session_option?: 'clear-all' | 'clear-last' | '';
 };
 
 export type RegisterInput = CommonInput &
@@ -137,8 +192,32 @@ export type RefreshTokenInput = CommonInput & {
   grant_type: string;
 };
 
+export type ChangePasswordInput = CommonInput & {
+  sdk_type: string;
+  user_id: string;
+  current_password: string;
+  new_password: string;
+};
+
+export type ForgetPasswordOTPSendInput = CommonInput & {
+  sdk_type: string;
+  receiver_type: 'forget-phone' | 'forget-email';
+  receiver: string;
+};
+
+export type ForgetPasswordOTPVerifyInput = ForgetPasswordOTPSendInput & {
+  code: string;
+};
+
 export type GetOrganizationInput = CommonInput & {};
-export type GetApplicationInput = CommonInput & {};
+export type GetApplicationInput = CommonInput & {
+  with_organization?: boolean;
+};
+
+export type GetUserInput = CommonInput & {
+  user_id: string;
+  sdk_type: string;
+};
 
 export class Access {
   data: any;
@@ -146,7 +225,7 @@ export class Access {
   private static instance: Access | null = null;
 
   constructor(data: any) {
-    if (data.error) throw new Error(data.error.message);
+    // if (data.error) throw new Error(data.error.message);
     this.data = data;
     if (!Access.instance) {
       Access.instance = this;
@@ -187,6 +266,26 @@ export class Access {
   async getApplication(getApplicationInput: GetApplicationInput) {
     return await getApplicationApi(getApplicationInput);
   }
+
+  async getUser(getUserInput: GetUserInput) {
+    return await getUserApi(getUserInput);
+  }
+
+  async changePassword(changePasswordInput: ChangePasswordInput) {
+    return await changePasswordApi(changePasswordInput);
+  }
+
+  async forgetPasswordOTPSend(
+    forgetPasswordOTPSendInput: ForgetPasswordOTPSendInput
+  ) {
+    return await forgetPasswordOTPSendApi(forgetPasswordOTPSendInput);
+  }
+
+  async forgetPasswordOTPVerify(
+    forgetPasswordOTPVerifyInput: ForgetPasswordOTPVerifyInput
+  ) {
+    return await forgetPasswordOTPVerifyApi(forgetPasswordOTPVerifyInput);
+  }
 }
 
 export default Access;
@@ -215,6 +314,7 @@ const main = async () => {
     region: 'US',
     redirect_uri: 'http://localhost:3000',
     country_code: '',
+    session_option: 'clear-all',
   };
 
   const logoutInput: LogoutInput = {
@@ -238,13 +338,13 @@ const main = async () => {
     },
     sdk_type: '',
     type: '',
-    username: 'mehedi1',
+    username: 'mehedi2',
     password: 'mehedi',
     name: 'Mehedi Hasan',
     first_name: 'Mehedi',
     last_name: 'Hasan',
-    email: 'mehedi1@yopmail.com',
-    phone: '1479503553',
+    email: 'mehedi2@yopmail.com',
+    phone: '1479503554',
     affiliation: '',
     id_card: '',
     region: '',
@@ -275,12 +375,48 @@ const main = async () => {
   // console.log(logoutRes);
 
   // const loginRes = await client.login(loginInput);
-  // console.log(loginRes);
+  // console.log(loginRes.data.data.data.user_id);
+
+  // const getUserRes = await client.getUser({
+  //   ...commonInput,
+  //   user_id: '7696d850-369e-4d3f-b822-fd816f499f9f',
+  //   sdk_type: 'frontend',
+  // });
+  // console.log(getUserRes.data);
+
+  // const changePasswordRes = await client.changePassword({
+  //   ...commonInput,
+  //   sdk_type: 'frontend',
+  //   user_id: '7696d850-369e-4d3f-b822-fd816f499f9f',
+  //   current_password: 'mehedi',
+  //   new_password: 'mehedi',
+  // });
+  // console.log(changePasswordRes);
+
+  // const forgetPasswordOTPSendRes = await client.forgetPasswordOTPSend({
+  //   ...commonInput,
+  //   sdk_type: 'frontend',
+  //   receiver_type: 'forget-phone',
+  //   receiver: '1479503552',
+  // });
+  // console.log(forgetPasswordOTPSendRes);
+
+  // const forgetPasswordOTPVerifyRes = await client.forgetPasswordOTPVerify({
+  //   ...commonInput,
+  //   sdk_type: 'frontend',
+  //   receiver_type: 'forget-phone',
+  //   receiver: '1479503552',
+  //   code: '852629',
+  // });
+  // console.log(forgetPasswordOTPVerifyRes);
 
   // const getOrganizationRes = await client.getOrganization(commonInput);
   // console.log(getOrganizationRes);
 
-  // const getApplicationRes = await client.getApplication(commonInput);
+  // const getApplicationRes = await client.getApplication({
+  //   ...commonInput,
+  //   with_organization: true,
+  // });
   // console.log(getApplicationRes);
 
   // console.log(loginRes);
@@ -290,4 +426,6 @@ const main = async () => {
   // });
 };
 
-main();
+// main();
+
+// 7696d850-369e-4d3f-b822-fd816f499f9f
