@@ -20,7 +20,7 @@ export type LoginInput = CommonInput & {
   email: string;
   phone: string;
   region: string;
-  redirect_uri: string;
+  redirect_uri?: string;
   country_code: string;
   session_option?: 'clear-all' | 'clear-last' | '';
 };
@@ -170,7 +170,7 @@ export class Access {
   async getOrganization(getOrganizationInput: GetOrganizationInput) {
     try {
       const res = await this.api.post(
-        `/organization/${getOrganizationInput.organization_id}`,
+        `/sdk/organization`,
         getOrganizationInput
       );
       return res.data;
@@ -183,7 +183,7 @@ export class Access {
     const { with_organization = false } = getApplicationInput;
     try {
       const res = await this.api.post(
-        `/application/${getApplicationInput.application_id}?with_organization=${with_organization}`,
+        `/sdk/application?with_organization=${with_organization}`,
         getApplicationInput
       );
       return res.data;
@@ -194,7 +194,7 @@ export class Access {
 
   async getUser(getUserInput: GetUserInput) {
     try {
-      const res = await this.api.post('/user', getUserInput);
+      const res = await this.api.post('/sdk/user', getUserInput);
       return res.data;
     } catch (error) {
       console.log(error);
@@ -204,7 +204,7 @@ export class Access {
   async changePassword(changePasswordInput: ChangePasswordInput) {
     try {
       const res = await this.api.patch(
-        '/user/change-password',
+        '/sdk/user/change-password',
         changePasswordInput
       );
       return res.data;
@@ -258,10 +258,10 @@ export default Access;
 
 const main = async () => {
   const commonInput = {
-    client_id: 'b2aca2edb9',
-    client_secret: '302479106f4fc38d9ee4',
-    application_id: '53d759b2-ff38-4a3c-bfb4-99198ba1586e',
-    organization_id: '8ad5f6ae-6dbc-4ff0-a1d2-0234344166dd',
+    organization_id: '03e9eacf-0a50-4eef-855e-ab91f97f05d5',
+    application_id: 'c80178cb-7b1e-4013-9fea-b4abf4c4cb02',
+    client_id: '1ce52ca341',
+    client_secret: 'cc0eb7dbb2c663850555',
   };
 
   const client = await Access.init({
@@ -270,16 +270,18 @@ const main = async () => {
     url: 'http://localhost:9111',
   });
 
+  // console.log({ client });
+
   const loginInput: LoginInput = {
     ...commonInput,
     type: 'login-username',
     response_type: 'token',
-    username: 'hasan',
+    username: 'mehedi',
     password: 'mehedi',
-    email: 'john.doe@yopmail.com',
-    phone: '1795035563',
+    email: 'mehedi@yopmail.com',
+    phone: '1479503550',
     region: 'US',
-    redirect_uri: 'http://localhost:3000',
+    // redirect_uri: '',
     country_code: '',
     session_option: 'clear-all',
   };
@@ -305,13 +307,13 @@ const main = async () => {
     },
     sdk_type: '',
     type: '',
-    username: 'mehedi2',
+    username: 'mehedi',
     password: 'mehedi',
     name: 'Mehedi Hasan',
     first_name: 'Mehedi',
     last_name: 'Hasan',
-    email: 'mehedi2@yopmail.com',
-    phone: '1479503554',
+    email: 'mehedi@yopmail.com',
+    phone: '1479503550',
     affiliation: '',
     id_card: '',
     region: '',
@@ -343,10 +345,11 @@ const main = async () => {
 
   // const loginRes = await client.login(loginInput);
   // console.log(loginRes.data.data.data.user_id);
+  // sign_in_resp_fields -> ["user_id"] && field_name_mappings -> {"user_id": "id"}
 
   // const getUserRes = await client.getUser({
   //   ...commonInput,
-  //   user_id: '7696d850-369e-4d3f-b822-fd816f499f9f',
+  //   user_id: 'cf188dae-bcf5-4069-9b4a-f4800561db31',
   //   sdk_type: 'frontend',
   // });
   // console.log(getUserRes);
@@ -354,7 +357,7 @@ const main = async () => {
   // const changePasswordRes = await client.changePassword({
   //   ...commonInput,
   //   sdk_type: 'frontend',
-  //   user_id: '7696d850-369e-4d3f-b822-fd816f499f9f',
+  //   user_id: 'cf188dae-bcf5-4069-9b4a-f4800561db31',
   //   current_password: 'mehedi',
   //   new_password: 'mehedi',
   // });
@@ -364,7 +367,7 @@ const main = async () => {
   //   ...commonInput,
   //   sdk_type: 'frontend',
   //   receiver_type: 'forget-phone',
-  //   receiver: '1479503552',
+  //   receiver: '1479503550',
   // });
   // console.log(forgetPasswordOTPSendRes);
 
@@ -372,19 +375,18 @@ const main = async () => {
   //   ...commonInput,
   //   sdk_type: 'frontend',
   //   receiver_type: 'forget-phone',
-  //   receiver: '1479503552',
-  //   code: '074446',
+  //   receiver: '1479503550',
+  //   code: '597985',
   // });
   // console.log(forgetPasswordOTPVerifyRes);
 
   // const forgetPasswordRes = await client.forgetPassword({
   //   ...commonInput,
   //   sdk_type: 'frontend',
-  //   reference: 'T9LpYHeafIMi',
+  //   reference: 'n7gaHtXVmc0X',
   //   password_confirm: 'mehedi',
   //   password: 'mehedi',
   // });
-
   // console.log({ forgetPasswordRes });
 
   // const getOrganizationRes = await client.getOrganization(commonInput);
