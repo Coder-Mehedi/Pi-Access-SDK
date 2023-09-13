@@ -12,9 +12,18 @@ export type SDKInitInput = CommonInput & {
   url: string;
 };
 
+export type LoginType =
+  | 'login-username'
+  | 'login-email'
+  | 'login-phone'
+  | 'login-cas'
+  | 'login-token';
+
+export type ResponseType = 'token' | 'id_token' | 'cas';
+
 export type LoginInput = CommonInput & {
-  type: string;
-  response_type: string;
+  type: LoginType;
+  response_type: ResponseType;
   username: string;
   password: string;
   email: string;
@@ -23,10 +32,13 @@ export type LoginInput = CommonInput & {
   redirect_uri?: string;
   country_code: string;
   session_option?: 'clear-all' | 'clear-last' | '';
+  access_token?: string;
+  ticket?: string;
+  service?: string;
 };
 
 export type RegisterInput = CommonInput &
-  Omit<LoginInput, 'response_type'> & {
+  Omit<LoginInput, 'response_type' | 'type'> & {
     metadata: {
       [key: string]: any;
     };
@@ -306,7 +318,6 @@ const main = async () => {
       has_business: false,
     },
     sdk_type: '',
-    type: '',
     username: 'mehedi',
     password: 'mehedi',
     name: 'Mehedi Hasan',
