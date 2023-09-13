@@ -8,7 +8,6 @@ export type CommonInput = {
 };
 
 export type SDKInitInput = CommonInput & {
-  sdk_type: string;
   url: string;
 };
 
@@ -131,7 +130,10 @@ export class Access {
     });
 
     try {
-      const res = await api.post('/sdk-init', input);
+      const res = await api.post('/sdk-init', {
+        ...input,
+        sdk_type: 'frontend',
+      });
       return new Access(res.data, api);
     } catch (error: any) {
       return new Access({ error }, api);
@@ -277,7 +279,6 @@ const main = async () => {
   };
 
   const client = await Access.init({
-    sdk_type: 'frontend',
     ...commonInput,
     url: 'http://localhost:9111',
   });

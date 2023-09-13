@@ -13,7 +13,6 @@ const commonInput = {
 
 ```
 const client = await Access.init({
-  sdk_type: 'frontend',
   ...commonInput,
   url: 'http://localhost:9111',
 });
