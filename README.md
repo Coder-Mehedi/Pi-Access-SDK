@@ -1,4 +1,4 @@
-### You can store the common input in a variable
+### Store the common input in a variable
 
 ```
 const commonInput = {

@@ -1,6 +1,6 @@
 {
   "name": "pi-access-sdk",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "This is a SDK for the PI Access API.",
   "main": "dist/index.js",
   "scripts": {
