@@ -24,13 +24,11 @@ export type ResponseType = 'token' | 'id_token' | 'cas';
 export type LoginInput = {
   type: LoginType;
   response_type: ResponseType;
-  username: string;
-  password: string;
-  email: string;
-  phone: string;
-  region: string;
+  username?: string;
+  password?: string;
+  email?: string;
+  phone?: string;
   redirect_uri?: string;
-  country_code: string;
   session_option?: 'clear-all' | 'clear-last' | '';
   access_token?: string;
   ticket?: string;
@@ -38,27 +36,21 @@ export type LoginInput = {
 };
 
 export type RegisterInput = Omit<LoginInput, 'response_type' | 'type'> & {
-  metadata: {
+  metadata?: {
     [key: string]: any;
   };
-  name: string;
-  first_name: string;
-  last_name: string;
-  affiliation: string;
-  id_card: string;
-  provider: string;
+  username: string;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
   code: string;
-  state: string;
-  method: string;
-  email_code: string;
-  phone_code: string;
-  auto_sign_in: boolean;
-  relay_state: string;
-  captcha_type: string;
-  captcha_token: string;
-  mfa_type: string;
-  passcode: string;
-  recovery_code: string;
+  state?: string;
+  method?: string;
+  email_code?: string;
+  phone_code?: string;
+  relay_state?: string;
+  country_code?: string;
+  confirm_password?: string;
 };
 
 export type LogoutInput = {
