@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance } from 'axios';
 import jwtDecode from 'jwt-decode';
 
 export type CommonInput = {
@@ -124,7 +124,8 @@ export class Access {
       const res = await api.post('/sdk-init', inputWithSdkType);
       return new Access(res.data, api, inputWithSdkType);
     } catch (error: any) {
-      return new Access({ error }, api, inputWithSdkType);
+      throw error;
+      // throw error;
     }
   }
 
@@ -135,8 +136,9 @@ export class Access {
         ...this.input,
       });
       return res.data;
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      // console.log(error);
+      throw error;
     }
   }
 
@@ -150,8 +152,8 @@ export class Access {
       });
       return res.data;
     } catch (error: any) {
-      console.log(error);
-      // throw error.response.data;
+      // console.log(error);
+      throw error;
     }
   }
 
@@ -162,8 +164,9 @@ export class Access {
         ...this.input,
       });
       return res.data;
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      throw error;
     }
   }
 
@@ -174,8 +177,10 @@ export class Access {
         ...this.input,
       });
       return res.data;
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      throw error;
+
+      // console.log(error);
     }
   }
 
@@ -186,8 +191,9 @@ export class Access {
         ...this.input,
       });
       return res.data;
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      // console.log(error);
+      throw error;
     }
   }
 
@@ -200,7 +206,7 @@ export class Access {
       );
       return res.data;
     } catch (error: any) {
-      return error.response.data;
+      throw error;
     }
   }
 
@@ -216,8 +222,9 @@ export class Access {
         ...this.input,
       });
       return res.data;
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      // console.log(error);
+      throw error;
     }
   }
 
@@ -230,7 +237,7 @@ export class Access {
       return res.data;
     } catch (error: any) {
       console.log(error);
-      // throw error.response.data;
+      throw error;
     }
   }
 
@@ -244,8 +251,8 @@ export class Access {
       });
       return res.data;
     } catch (error: any) {
-      console.log(error);
-      // throw error.response.data;
+      // console.log(error);
+      throw error;
     }
   }
 
@@ -259,8 +266,8 @@ export class Access {
       });
       return res.data;
     } catch (error: any) {
-      console.log(error);
-      // throw error.response.data;
+      // console.log(error);
+      throw error;
     }
   }
 
@@ -271,10 +278,23 @@ export class Access {
         ...this.input,
       });
       return res.data;
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      // console.log(error);
+      throw error;
     }
   }
 }
 
 export default Access;
+
+async function main() {
+  const client = await Access.init({
+    organization_id: 'a3961e2e-28b4-4fbe-9598-5beb19ee86c44',
+    application_id: 'f8fca1d7-edec-4348-96da-143ea429e373',
+    client_id: 'a6c4c590ae',
+    client_secret: 'b1883a734d266ff985a1',
+    url: 'http://54.169.254.219:8088',
+  });
+  console.log(client);
+}
+main();
