@@ -43,7 +43,6 @@ export type RegisterInput = Omit<LoginInput, 'response_type' | 'type'> & {
   name?: string;
   first_name?: string;
   last_name?: string;
-  code: string;
   state?: string;
   method?: string;
   email_code?: string;
