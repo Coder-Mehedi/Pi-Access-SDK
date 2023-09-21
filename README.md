@@ -9,10 +9,10 @@ const commonInput = {
 };
 ```
 
-### Initialize the client with the following code
+### Create a new client instance of Access
 
 ```
-const client = await Access.init({
+const client = new Access({
   ...commonInput,
   url: 'http://localhost:9111',
 });

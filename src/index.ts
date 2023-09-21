@@ -97,36 +97,41 @@ export class Access {
 
   private static instance: Access | null = null;
 
-  constructor(data: any, api: AxiosInstance, input: SDKInitInput | null) {
+  constructor(input: SDKInitInput) {
     // if (data.error) throw new Error(data.error.message);
-    this.data = data;
-    this.api = api;
-    this.input = input;
 
     if (!Access.instance) {
       Access.instance = this;
     }
 
-    return Access.instance;
-  }
-
-  static async init(input: SDKInitInput): Promise<Access> {
-    const inputWithSdkType = { ...input, sdk_type: 'frontend' };
-
-    const api = axios.create({
+    this.input = input;
+    this.api = axios.create({
       baseURL: input.url,
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    try {
-      const res = await api.post('/sdk-init', inputWithSdkType);
-      return new Access(res.data, api, inputWithSdkType);
-    } catch (error: any) {
-      throw error.response;
-    }
+    return Access.instance;
   }
+
+  // static async init(input: SDKInitInput): Promise<Access> {
+  //   const inputWithSdkType = { ...input, sdk_type: 'frontend' };
+
+  //   const api = axios.create({
+  //     baseURL: input.url,
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //   });
+
+  //   try {
+  //     const res = await api.post('/sdk-init', inputWithSdkType);
+  //     return new Access(res.data, api, inputWithSdkType);
+  //   } catch (error: any) {
+  //     throw error.response;
+  //   }
+  // }
 
   async register(registerInput: RegisterInput) {
     try {
@@ -285,19 +290,3 @@ export class Access {
 }
 
 export default Access;
-
-// async function main() {
-//   try {
-//     const client = await Access.init({
-//       organization_id: 'a3961e2e-28b4-4fbe-9598-5beb19ee86c44',
-//       application_id: 'f8fca1d7-edec-4348-96da-143ea429e373',
-//       client_id: 'a6c4c590ae',
-//       client_secret: 'b1883a734d266ff985a1',
-//       url: 'http://54.169.254.219:8088',
-//     });
-//     console.log(client);
-//   } catch (error) {
-//     console.log('error from main', error);
-//   }
-// }
-// main();
