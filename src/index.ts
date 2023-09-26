@@ -176,7 +176,7 @@ export class Access {
   }
 
   async refreshToken(refreshTokenInput: RefreshTokenInput) {
-    console.log('refresh token called');
+    console.log('SDK: refresh token called');
     // store refresh token in memory and use it to refresh token
     // if refresh token is same as previous one then cache it and return same response
 
@@ -184,26 +184,38 @@ export class Access {
     const found = this.refreshTokensWithResponse.find(
       (item) => item.refresh_token === refresh_token
     );
-    console.log({ found });
-    if (found) return found;
+    console.log('SDK', { found });
+    if (found && found.response) return found.response;
+
+    // if not found store the refresh token and after response store it in cache as value of refresh token
+    if (!found)
+      this.refreshTokensWithResponse.push({ refresh_token, response: null });
 
     try {
       const res = await this.api.post('/auth/refresh', {
         ...refreshTokenInput,
         ...this.input,
       });
-      this.refreshTokensWithResponse.push({
-        refresh_token,
-        response: res.data,
-      });
+      this.refreshTokensWithResponse = this.refreshTokensWithResponse.map(
+        (item) => {
+          if (item.refresh_token === refresh_token) {
+            return {
+              ...item,
+              response: res.data,
+            };
+          }
+          return item;
+        }
+      );
+
       // setTimeout(() => {
       //   this.refreshTokensWithResponse = this.refreshTokensWithResponse.filter(
       //     (item) => item.refresh_token !== refresh_token
       //   );
       // }, 10000);
 
-      console.log('refresh token response', res.data);
-      console.log('refresh token', this.refreshTokensWithResponse);
+      console.log('SDK: refresh token response', res.data);
+      console.log('SDK: refresh token', this.refreshTokensWithResponse);
 
       return res.data;
     } catch (error: any) {
