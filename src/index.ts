@@ -94,6 +94,7 @@ export class Access {
   data: any;
   api: AxiosInstance;
   input: SDKInitInput | null = null;
+  refreshTokensWithResponse: any[] = [];
 
   private static instance: Access | null = null;
 
@@ -175,11 +176,31 @@ export class Access {
   }
 
   async refreshToken(refreshTokenInput: RefreshTokenInput) {
+    // store refresh token in memory and use it to refresh token
+    // if refresh token is same as previous one then cache it and return same response
+
+    const { refresh_token } = refreshTokenInput;
+    const found = this.refreshTokensWithResponse.find(
+      (item) => item.refresh_token === refresh_token
+    );
+
+    if (found) return found;
+
     try {
       const res = await this.api.post('/auth/refresh', {
         ...refreshTokenInput,
         ...this.input,
       });
+      this.refreshTokensWithResponse.push({
+        refresh_token,
+        response: res.data,
+      });
+      setTimeout(() => {
+        this.refreshTokensWithResponse = this.refreshTokensWithResponse.filter(
+          (item) => item.refresh_token !== refresh_token
+        );
+      }, 10000);
+
       return res.data;
     } catch (error: any) {
       throw error;
