@@ -176,6 +176,7 @@ export class Access {
   }
 
   async refreshToken(refreshTokenInput: RefreshTokenInput) {
+    console.log('refresh token called');
     // store refresh token in memory and use it to refresh token
     // if refresh token is same as previous one then cache it and return same response
 
@@ -183,7 +184,7 @@ export class Access {
     const found = this.refreshTokensWithResponse.find(
       (item) => item.refresh_token === refresh_token
     );
-
+    console.log({ found });
     if (found) return found;
 
     try {
@@ -195,11 +196,14 @@ export class Access {
         refresh_token,
         response: res.data,
       });
-      setTimeout(() => {
-        this.refreshTokensWithResponse = this.refreshTokensWithResponse.filter(
-          (item) => item.refresh_token !== refresh_token
-        );
-      }, 10000);
+      // setTimeout(() => {
+      //   this.refreshTokensWithResponse = this.refreshTokensWithResponse.filter(
+      //     (item) => item.refresh_token !== refresh_token
+      //   );
+      // }, 10000);
+
+      console.log('refresh token response', res.data);
+      console.log('refresh token', this.refreshTokensWithResponse);
 
       return res.data;
     } catch (error: any) {
@@ -207,6 +211,10 @@ export class Access {
 
       // console.log(error);
     }
+  }
+
+  printCurrentRefreshTokens() {
+    console.log(this.refreshTokensWithResponse);
   }
 
   async getOrganization(getOrganizationInput: GetOrganizationInput) {
