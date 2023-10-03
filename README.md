@@ -25,7 +25,6 @@ const client = new Access({
 
 ```
 const loginInput: LoginInput = {
-  ...commonInput,
   type: 'login-username',
   response_type: 'token',
   username: 'mehedi',
@@ -49,7 +48,6 @@ field_name_mappings -> {"user_id": "id"}
 
 ```
 const logoutInput: LogoutInput = {
-  ...commonInput,
   refresh_token: '',
 };
 
@@ -59,7 +57,6 @@ console.log(logoutRes);
 
 ```
 const refreshTokenInput: RefreshTokenInput = {
-  ...commonInput,
   refresh_token: '',
   grant_type: 'refresh_token',
 };
@@ -70,7 +67,6 @@ console.log(refreshTokenRes);
 
 ```
 const registerInput: RegisterInput = {
-  ...commonInput,
   metadata: {
     name: 'onimesh mitra2',
     profile_picture: 'somecdnlink',
@@ -110,7 +106,6 @@ console.log(registerRes);
 
 ```
 const getUserRes = await client.getUser({
-  ...commonInput,
   user_id: 'cf188dae-bcf5-4069-9b4a-f4800561db31',
   sdk_type: 'frontend',
 });
@@ -119,7 +114,6 @@ console.log(getUserRes);
 
 ```
 const changePasswordRes = await client.changePassword({
-  ...commonInput,
   sdk_type: 'frontend',
   user_id: 'cf188dae-bcf5-4069-9b4a-f4800561db31',
   current_password: 'mehedi',
@@ -130,7 +124,6 @@ console.log(changePasswordRes);
 
 ```
 const forgetPasswordOTPSendRes = await client.forgetPasswordOTPSend({
-  ...commonInput,
   sdk_type: 'frontend',
   receiver_type: 'forget-phone',
   receiver: '1479503550',
@@ -141,7 +134,6 @@ console.log(forgetPasswordOTPSendRes);
 
 ```
 const forgetPasswordOTPVerifyRes = await client.forgetPasswordOTPVerify({
-  ...commonInput,
   sdk_type: 'frontend',
   receiver_type: 'forget-phone',
   receiver: '1479503550',
@@ -152,7 +144,6 @@ console.log(forgetPasswordOTPVerifyRes);
 
 ```
 const forgetPasswordRes = await client.forgetPassword({
-  ...commonInput,
   sdk_type: 'frontend',
   reference: 'n7gaHtXVmc0X',
   password_confirm: 'mehedi',
@@ -168,7 +159,6 @@ console.log(getOrganizationRes);
 
 ```
 const getApplicationRes = await client.getApplication({
-  ...commonInput,
   with_organization: true,
 });
 console.log(getApplicationRes);

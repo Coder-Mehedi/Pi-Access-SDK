@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import jwtDecode from 'jwt-decode';
 
 export type CommonInput = {
@@ -184,8 +184,7 @@ export class Access {
     const { refresh_token } = refreshTokenInput;
 
     const cachedRefreshToken = this.refreshTokensWithResponse[refresh_token];
-    if (cachedRefreshToken)
-      return this.refreshTokensWithResponse[refresh_token];
+    if (cachedRefreshToken) return cachedRefreshToken;
 
     if (!cachedRefreshToken)
       this.refreshTokensWithResponse[refresh_token] = null;
@@ -198,9 +197,9 @@ export class Access {
 
       this.refreshTokensWithResponse[refresh_token] = res.data;
 
-      // setTimeout(() => {
-      //   delete this.refreshTokensWithResponse[refresh_token];
-      // }, 10000);
+      setTimeout(() => {
+        delete this.refreshTokensWithResponse?.[refresh_token];
+      }, 10000);
 
       console.log('SDK: refresh token response', res.data);
       console.log('SDK: refresh token', this.refreshTokensWithResponse);
