@@ -193,6 +193,8 @@ export class Access {
     const { refresh_token } = refreshTokenInput;
 
     const cachedRefreshToken = this.refreshTokensWithResponse[refresh_token];
+    console.log('SDK: cached refresh token', cachedRefreshToken);
+
     if (cachedRefreshToken) return cachedRefreshToken;
 
     if (!cachedRefreshToken) {
