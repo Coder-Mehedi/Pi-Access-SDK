@@ -92,12 +92,18 @@ export type ForgetPasswordInput = {
 type refreshTokensWithResponseType = {
   [key: string]: string | null;
 };
+type RefreshTokenRequest = {
+  input: RefreshTokenInput;
+  resolve: (value: any) => void;
+  reject: (reason?: any) => void;
+};
 
 export class Access {
   data: any;
   api: AxiosInstance;
   input: SDKInitInput | null = null;
   refreshTokensWithResponse: refreshTokensWithResponseType = {};
+  refreshTokenQueue: RefreshTokenRequest[] = [];
 
   private static instance: Access | null = null;
 
@@ -180,36 +186,58 @@ export class Access {
 
   async refreshToken(refreshTokenInput: RefreshTokenInput) {
     console.log('SDK: refresh token called');
+    console.log('SDK: refresh token input', refreshTokenInput);
+    console.log('SDK: refresh token queue', this.refreshTokenQueue);
+    console.log('SDK: refresh token map', this.refreshTokensWithResponse);
 
     const { refresh_token } = refreshTokenInput;
 
     const cachedRefreshToken = this.refreshTokensWithResponse[refresh_token];
     if (cachedRefreshToken) return cachedRefreshToken;
 
-    if (!cachedRefreshToken)
-      this.refreshTokensWithResponse[refresh_token] = null;
+    if (!cachedRefreshToken) {
+      const promise = new Promise((resolve, reject) => {
+        this.refreshTokenQueue.push({
+          input: refreshTokenInput,
+          resolve,
+          reject,
+        });
+      });
+
+      this.processQueue();
+
+      return promise;
+    }
+
+    return null;
+  }
+
+  async processQueue() {
+    if (this.refreshTokenQueue.length === 0) return;
+
+    const { input, resolve, reject } = this.refreshTokenQueue.shift()!;
 
     try {
       const res = await this.api.post('/auth/refresh', {
-        ...refreshTokenInput,
+        ...input,
         ...this.input,
       });
 
-      this.refreshTokensWithResponse[refresh_token] = res.data;
+      this.refreshTokensWithResponse[input.refresh_token] = res.data;
 
-      setTimeout(() => {
-        delete this.refreshTokensWithResponse?.[refresh_token];
-      }, 10000);
+      // setTimeout(() => {
+      //   delete this.refreshTokensWithResponse?.[input.refresh_token];
+      // }, 10000);
 
       console.log('SDK: refresh token response', res.data);
       console.log('SDK: refresh token', this.refreshTokensWithResponse);
 
-      return res.data;
+      resolve(res.data);
     } catch (error: any) {
-      throw error;
-
-      // console.log(error);
+      reject(error);
     }
+
+    this.processQueue();
   }
 
   printCurrentRefreshTokens() {
