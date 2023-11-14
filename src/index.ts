@@ -223,10 +223,21 @@ export class Access {
       const cachedRefreshToken =
         this.refreshTokensWithResponse[input.refresh_token];
 
-      if (cachedRefreshToken) {
-        resolve(cachedRefreshToken);
-        return;
+      if (cachedRefreshToken === 'loading') {
+        const promise = new Promise((resolve, reject) => {
+          this.refreshTokenQueue.push({
+            input: input,
+            resolve,
+            reject,
+          });
+        });
+
+        this.processQueue();
+
+        // return resolve(promise)
       }
+
+      this.refreshTokensWithResponse[input.refresh_token] = 'loading';
 
       const res = await this.api.post('/auth/refresh', {
         ...input,
@@ -356,3 +367,40 @@ export class Access {
 }
 
 export default Access;
+
+// const REFRESH_TOKEN =
+//   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJjYTdjZjk1Yi03ZDJhLTRjZWQtODEzMS0zOTMwMGU5ZTdiMTIiLCJ0b2tlblR5cGUiOiJyZWZyZXNoLXRva2VuIiwiQXBwbGljYXRpb24iOiJmOGZjYTFkNy1lZGVjLTQzNDgtOTZkYS0xNDNlYTQyOWUzNzMiLCJBcHBsaWNhdGlvblVzZXJJRCI6IjM0IiwiRW1haWwiOiJzaGliYmlyYWthbmRhQGdtYWlsLmNvbSIsIlNlc3Npb24iOiI4MTY2YTExYy1kNWY2LTRiYjAtOTE0Ni05MGM2N2VjMDQ1NzMiLCJhdWQiOiJmOGZjYTFkNy1lZGVjLTQzNDgtOTZkYS0xNDNlYTQyOWUzNzMiLCJleHAiOjE3MDA1NzE2MDEsImp0aSI6ImNhN2NmOTViLTdkMmEtNGNlZC04MTMxLTM5MzAwZTllN2IxMiIsImlhdCI6MTY5OTk2NjgwMSwiaXNzIjoiZjhmY2ExZDctZWRlYy00MzQ4LTk2ZGEtMTQzZWE0MjllMzczIiwibmJmIjoxNjk5OTY2ODAxLCJzdWIiOiIzNCJ9.Kb910pUsLPkhjAlQhJa-updF2Fx2RF92AXa8tAtnqv4QU929A45lMRoSV3dcdIgcz-xZ9g_ohg1_BELvh9FkuqDI-B3dWDULokl4VMgKRMNXy0dYyo16gKHW-gsBJesk7524iR-Xizwga7ZUtwLEOAwKRsta9CZKjAqiKxaXf82p8KgWOjrTl0p_XBH_-9T8AJJZE56FJJ4jB0LDEx-ouprjV_9ZtoNs1XFLrGO5SMsnFgdeoVO44NPOwA5_NPwQdf5KiiEMifb_G3sjMwwUGKUZrpXvzFsPfhuELSxlHGSE9XXhKm4fGNk8RYDAWj4FJ037zMAhd_2_Hb-YtsF1Tw';
+
+// const access = new Access({
+//   url: 'http://54.169.254.219:8088',
+//   application_id: '8c581a33-1b24-4012-abc4-92b1be8a07cb',
+//   client_id: '42e25f2a0f',
+//   client_secret: '4e7a25873f1a84d04a93',
+//   organization_id: '0050da35-8769-45ff-96a1-c7ac13d265c4',
+// });
+// const main = async () => {
+//   access.refreshToken({
+//     grant_type: 'refresh_token',
+//     refresh_token: REFRESH_TOKEN,
+//   });
+
+//   access.refreshToken({
+//     grant_type: 'refresh_token',
+//     refresh_token: REFRESH_TOKEN,
+//   });
+//   access.refreshToken({
+//     grant_type: 'refresh_token',
+//     refresh_token: REFRESH_TOKEN,
+//   });
+//   access.refreshToken({
+//     grant_type: 'refresh_token',
+//     refresh_token: REFRESH_TOKEN,
+//   });
+// };
+
+// main();
+// main();
+// main();
+// main();
+// main();
+// main();
