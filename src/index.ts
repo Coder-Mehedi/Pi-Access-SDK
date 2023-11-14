@@ -164,7 +164,7 @@ export class Access {
         session_option,
         ...this.input,
       });
-      return res.data;
+      return res.data.data.data;
     } catch (error: any) {
       // console.log(error);
       throw error;
@@ -220,6 +220,14 @@ export class Access {
     const { input, resolve, reject } = this.refreshTokenQueue.shift()!;
 
     try {
+      const cachedRefreshToken =
+        this.refreshTokensWithResponse[input.refresh_token];
+
+      if (cachedRefreshToken) {
+        resolve(cachedRefreshToken);
+        return;
+      }
+
       const res = await this.api.post('/auth/refresh', {
         ...input,
         ...this.input,
