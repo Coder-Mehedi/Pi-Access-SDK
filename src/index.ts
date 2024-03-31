@@ -1,5 +1,5 @@
-import axios, { AxiosInstance } from 'axios';
-import jwtDecode from 'jwt-decode';
+import axios, { AxiosInstance } from "axios";
+import jwtDecode from "jwt-decode";
 
 export type CommonInput = {
   client_id: string;
@@ -13,13 +13,13 @@ export type SDKInitInput = CommonInput & {
 };
 
 export type LoginType =
-  | 'login-username'
-  | 'login-email'
-  | 'login-phone'
-  | 'login-cas'
-  | 'login-token';
+  | "login-username"
+  | "login-email"
+  | "login-phone"
+  | "login-cas"
+  | "login-token";
 
-export type ResponseType = 'token' | 'id_token' | 'cas';
+export type ResponseType = "token" | "id_token" | "cas";
 
 export type LoginInput = {
   type: LoginType;
@@ -29,13 +29,13 @@ export type LoginInput = {
   email?: string;
   phone?: string;
   redirect_uri?: string;
-  session_option?: 'clear-all' | 'clear-last' | '';
+  session_option?: "clear-all" | "clear-last" | "";
   access_token?: string;
   ticket?: string;
   service?: string;
 };
 
-export type RegisterInput = Omit<LoginInput, 'response_type' | 'type'> & {
+export type RegisterInput = Omit<LoginInput, "response_type" | "type"> & {
   metadata?: {
     [key: string]: any;
   };
@@ -68,7 +68,7 @@ export type ChangePasswordInput = {
 };
 
 export type ForgetPasswordOTPSendInput = {
-  receiver_type: 'forget-phone' | 'forget-email';
+  receiver_type: "forget-phone" | "forget-email";
   receiver: string;
 };
 
@@ -118,7 +118,7 @@ export class Access {
     this.api = axios.create({
       baseURL: input.url,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -145,7 +145,7 @@ export class Access {
 
   async register(registerInput: RegisterInput) {
     try {
-      const res = await this.api.post('/auth/signup', {
+      const res = await this.api.post("/auth/signup", {
         ...registerInput,
         ...this.input,
       });
@@ -157,9 +157,9 @@ export class Access {
   }
 
   async login(loginInput: LoginInput) {
-    const { session_option = '' } = loginInput;
+    const { session_option = "" } = loginInput;
     try {
-      const res = await this.api.post('/auth/signin', {
+      const res = await this.api.post("/auth/signin", {
         ...loginInput,
         session_option,
         ...this.input,
@@ -173,7 +173,7 @@ export class Access {
 
   async logout(logoutInput: LogoutInput) {
     try {
-      const res = await this.api.post('/auth/signout', {
+      const res = await this.api.post("/auth/signout", {
         ...logoutInput,
         ...this.input,
       });
@@ -185,81 +185,93 @@ export class Access {
   }
 
   async refreshToken(refreshTokenInput: RefreshTokenInput) {
-    console.log('SDK: refresh token called');
-    console.log('SDK: refresh token input', refreshTokenInput);
-    console.log('SDK: refresh token queue', this.refreshTokenQueue);
-    // console.log("SDK: refresh token map", this.refreshTokensWithResponse);
-
-    const { refresh_token } = refreshTokenInput;
-
-    const cachedRefreshToken = this.refreshTokensWithResponse[refresh_token];
-    console.log('SDK: cached refresh token', cachedRefreshToken);
-
-    if (cachedRefreshToken) return cachedRefreshToken;
-
-    if (!cachedRefreshToken) {
-      const promise = new Promise((resolve, reject) => {
-        this.refreshTokenQueue.push({
-          input: refreshTokenInput,
-          resolve,
-          reject,
-        });
-      });
-
-      this.processQueue();
-
-      return promise;
-    }
-
-    return null;
-  }
-
-  async processQueue() {
-    if (this.refreshTokenQueue.length === 0) return;
-
-    const { input, resolve, reject } = this.refreshTokenQueue.shift()!;
-
     try {
-      const cachedRefreshToken =
-        this.refreshTokensWithResponse[input.refresh_token];
-
-      if (cachedRefreshToken === 'loading') {
-        const promise = new Promise((resolve, reject) => {
-          this.refreshTokenQueue.push({
-            input: input,
-            resolve,
-            reject,
-          });
-        });
-
-        this.processQueue();
-
-        // return resolve(promise)
-      }
-
-      this.refreshTokensWithResponse[input.refresh_token] = 'loading';
-
-      const res = await this.api.post('/auth/refresh', {
-        ...input,
+      const res = await this.api.post("/auth/refresh", {
+        ...refreshTokenInput,
         ...this.input,
       });
-
-      this.refreshTokensWithResponse[input.refresh_token] = res.data;
-
-      // setTimeout(() => {
-      //   delete this.refreshTokensWithResponse?.[input.refresh_token];
-      // }, 10000);
-
-      console.log('SDK: refresh token response', res.data);
-      console.log('SDK: refresh token', this.refreshTokensWithResponse);
-
-      resolve(res.data);
+      return res.data;
     } catch (error: any) {
-      reject(error);
+      throw error;
     }
-
-    this.processQueue();
   }
+
+  // async refreshToken(refreshTokenInput: RefreshTokenInput) {
+  //   console.log('SDK: refresh token called');
+  //   console.log('SDK: refresh token input', refreshTokenInput);
+  //   console.log('SDK: refresh token queue', this.refreshTokenQueue);
+  //   // console.log("SDK: refresh token map", this.refreshTokensWithResponse);
+
+  //   const { refresh_token } = refreshTokenInput;
+
+  //   const cachedRefreshToken = this.refreshTokensWithResponse[refresh_token];
+  //   console.log('SDK: cached refresh token', cachedRefreshToken);
+
+  //   if (cachedRefreshToken) return cachedRefreshToken;
+
+  //   if (!cachedRefreshToken) {
+  //     const promise = new Promise((resolve, reject) => {
+  //       this.refreshTokenQueue.push({
+  //         input: refreshTokenInput,
+  //         resolve,
+  //         reject,
+  //       });
+  //     });
+
+  //     this.processQueue();
+
+  //     return promise;
+  //   }
+
+  //   return null;
+  // }
+
+  // async processQueue() {
+  //   if (this.refreshTokenQueue.length === 0) return;
+
+  //   const { input, resolve, reject } = this.refreshTokenQueue.shift()!;
+
+  //   try {
+  //     const cachedRefreshToken =
+  //       this.refreshTokensWithResponse[input.refresh_token];
+
+  //     if (cachedRefreshToken === 'loading') {
+  //       const promise = new Promise((resolve, reject) => {
+  //         this.refreshTokenQueue.push({
+  //           input: input,
+  //           resolve,
+  //           reject,
+  //         });
+  //       });
+
+  //       this.processQueue();
+
+  //       // return resolve(promise)
+  //     }
+
+  //     this.refreshTokensWithResponse[input.refresh_token] = 'loading';
+
+  //     const res = await this.api.post('/auth/refresh', {
+  //       ...input,
+  //       ...this.input,
+  //     });
+
+  //     this.refreshTokensWithResponse[input.refresh_token] = res.data;
+
+  //     // setTimeout(() => {
+  //     //   delete this.refreshTokensWithResponse?.[input.refresh_token];
+  //     // }, 10000);
+
+  //     console.log('SDK: refresh token response', res.data);
+  //     console.log('SDK: refresh token', this.refreshTokensWithResponse);
+
+  //     resolve(res.data);
+  //   } catch (error: any) {
+  //     reject(error);
+  //   }
+
+  //   this.processQueue();
+  // }
 
   printCurrentRefreshTokens() {
     console.log(this.refreshTokensWithResponse);
@@ -298,7 +310,7 @@ export class Access {
 
   async getUser(getUserInput: GetUserInput) {
     try {
-      const res = await this.api.post('/sdk/user', {
+      const res = await this.api.post("/sdk/user", {
         ...getUserInput,
         ...this.input,
       });
@@ -311,7 +323,7 @@ export class Access {
 
   async changePassword(changePasswordInput: ChangePasswordInput) {
     try {
-      const res = await this.api.patch('/sdk/user/change-password', {
+      const res = await this.api.patch("/sdk/user/change-password", {
         ...changePasswordInput,
         ...this.input,
       });
@@ -326,7 +338,7 @@ export class Access {
     forgetPasswordOTPSendInput: ForgetPasswordOTPSendInput
   ) {
     try {
-      const res = await this.api.post('/forget-password/otp/send', {
+      const res = await this.api.post("/forget-password/otp/send", {
         ...forgetPasswordOTPSendInput,
         ...this.input,
       });
@@ -341,7 +353,7 @@ export class Access {
     forgetPasswordOTPVerifyInput: ForgetPasswordOTPVerifyInput
   ) {
     try {
-      const res = await this.api.post('/forget-password/otp/verify', {
+      const res = await this.api.post("/forget-password/otp/verify", {
         ...forgetPasswordOTPVerifyInput,
         ...this.input,
       });
@@ -369,7 +381,7 @@ export class Access {
 export default Access;
 
 // const REFRESH_TOKEN1 =
-//   "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIwM2VkZjZiMy04NGY3LTQ2OTUtOWI2Yy1iMjhmYjM5MzUyY2IiLCJ0b2tlblR5cGUiOiJyZWZyZXNoLXRva2VuIiwiQXBwbGljYXRpb24iOiJmOGY1ZmM1Mi1lNmNmLTQyYTktYjBhOC04OWY1YzRlMWE2ZTEiLCJBcHBsaWNhdGlvblVzZXJJRCI6IjUiLCJFbWFpbCI6IiIsIlNlc3Npb24iOiIxOGI4MTVmOS1lZTZjLTQ3MGQtYjNhNS1lZTVmN2ZhZGEyNjEiLCJhdWQiOiJmOGY1ZmM1Mi1lNmNmLTQyYTktYjBhOC04OWY1YzRlMWE2ZTEiLCJleHAiOjE3MDIyOTMyODcsImp0aSI6IjAzZWRmNmIzLTg0ZjctNDY5NS05YjZjLWIyOGZiMzkzNTJjYiIsImlhdCI6MTcwMTY4ODQ4NywiaXNzIjoiZjhmNWZjNTItZTZjZi00MmE5LWIwYTgtODlmNWM0ZTFhNmUxIiwibmJmIjoxNzAxNjg4NDg3LCJzdWIiOiI1In0.cynECTQBBenVPiyGMATplQOnSbdC2pDZrBNWgaMZ3SPAprlkYF_mpG09_TEwPkjVjBsTOVk4LKQ4AX17awgIq4fFubhxQb2n854e0RqdSVBLFHA9tRMJJDVQXID_pSV-khV5ioRCRjAIFsyAQybq0q_1eqHwKqOoFjof4QauSj4q7RvfnTidnJoW-TlV_Pa0_SbX-HdlSMs6RCmnzXqAIhhde9dfDO8A4vDq-GTOP8RfAfva86x_Lj4cgnO0CoZObgboZ5qGSE6oqQBwY8BWCfcSr5btedzM57Libr86Zv09Hib8lzWtVcBgw3UJ-AS-_lu3CTfmr5y3hKgAVfIzpG8Aq-ljc_lI1qCR5eZmTkTBnUWF5YykZQ-7UnbHo7OwVQzl6EK8BbjZeBXlwppP7xz-otD_uwW9ttx75qGUzZAzNC3fg6KF9SFUomI54U6VWvfJYXr8_v3R_FKcirTVXzPv44rdSZ042bcLWDuKBqny02asVojJuBMDuGXiw8AvKgcYjnhyxTKygHhi3ZLKay5slorVdvP1k1pNsCAOMGzdDKDAS62283tALYSn0Xab_NCCbhfV3FH4u_y-FULBY0yFXadGXb37BLWS94hsEILLO7s0mkj9NX1FYhQ9fpGKW4oCNf--ZQLfLsfEqpvsF230JxpVjBIe8gyZjlFQMwU";
+//   "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIwMGE5ZmNmZC03NDhjLTQ2N2EtOTBjZi05NzY3NjhjMGFmOGYiLCJ0b2tlblR5cGUiOiJyZWZyZXNoLXRva2VuIiwiQXBwbGljYXRpb24iOiJmOGY1ZmM1Mi1lNmNmLTQyYTktYjBhOC04OWY1YzRlMWE2ZTEiLCJBcHBsaWNhdGlvblVzZXJJRCI6IjE4IiwiRW1haWwiOiIiLCJTZXNzaW9uIjoiYTM4NDBhOGUtOTdiZS00YTcwLWJjNmQtYzM1YmM1NDZjZDYxIiwiYXVkIjoiZjhmNWZjNTItZTZjZi00MmE5LWIwYTgtODlmNWM0ZTFhNmUxIiwiZXhwIjoxNzExNTE2ODcyLCJqdGkiOiIwMGE5ZmNmZC03NDhjLTQ2N2EtOTBjZi05NzY3NjhjMGFmOGYiLCJpYXQiOjE3MTA5MTIwNzIsImlzcyI6ImY4ZjVmYzUyLWU2Y2YtNDJhOS1iMGE4LTg5ZjVjNGUxYTZlMSIsIm5iZiI6MTcxMDkxMjA3Miwic3ViIjoiMTgifQ.Ma__AXeAdDj0UzmhXt198Fil42cbCX1vaBVVxAc8lXL-XnKtMp-n1bp46Ld8B8h7T1M2Xd_ix4LpQQMzYsWSDNDNiRSe4XQPeflpmhKF4mbfgVtaa_-Lx01NNXdkTqMh_MhHE3oFY7hY0IUpPo9gdGmm2p8e0i7lNwmK3sR68FuZFA7dZ7bQRb7t36-1HtHzoauLXqnX2dJvmGony-AfNi9aI9Rq_Ad--APlPrKaF4PZcYszyJJ44VFbKXdV4mcenxH-mBm-mypQbl2RRTYi0hOu77FGqgmgCb90tbk5qTNybOOOahH5XjQdlix2GhcBWMs6H4OitsuSqO6nWHqZT1h9c_XzzbPYHE8y0IZGDZpCxbEuehrqhQ0QxWeQruUNuGYw-KgQ8p4Mj_k-Mo5jF6JW-1FSz82A0_I0PCuxfS-uqYNbqjEtWsTEzlZy5PLwy7xnRRDbqW7MVHUYN0Nd12tLEdfCAsVjp8kWr96VWGM2nGI-ObF_xdxR0G9ZtZ8tXD58r00LoSyfS0bVLPxMpenWD9nIGbeejT_nhPKcLQ1Ch2HglVe59CK1J5Y9l5QLXQpBsINbsVy1hftRNXdIB85_0WWwuPn_Tfm3mR8-bEYNCBlzL-O_ouPQXqiVKRInQVh9Gs0aOIQj6-u6Dyd8Ye1tWbiOL5YJGroiyURxzi0";
 
 // const REFRESH_TOKEN2 =
 //   "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJlMmMyYWE0Ni03OGVlLTQ5Y2ItYWZmNy05MzJjNzc1MzZhNTAiLCJ0b2tlblR5cGUiOiJyZWZyZXNoLXRva2VuIiwiQXBwbGljYXRpb24iOiJmOGY1ZmM1Mi1lNmNmLTQyYTktYjBhOC04OWY1YzRlMWE2ZTEiLCJBcHBsaWNhdGlvblVzZXJJRCI6IjciLCJFbWFpbCI6IiIsIlNlc3Npb24iOiI3MWJmODY5Mi1hNjYyLTQ1NWMtYWE0Mi1lYWFhYmE2NDhjMjMiLCJhdWQiOiJmOGY1ZmM1Mi1lNmNmLTQyYTktYjBhOC04OWY1YzRlMWE2ZTEiLCJleHAiOjE3MDIyOTM1MDQsImp0aSI6ImUyYzJhYTQ2LTc4ZWUtNDljYi1hZmY3LTkzMmM3NzUzNmE1MCIsImlhdCI6MTcwMTY4ODcwNCwiaXNzIjoiZjhmNWZjNTItZTZjZi00MmE5LWIwYTgtODlmNWM0ZTFhNmUxIiwibmJmIjoxNzAxNjg4NzA0LCJzdWIiOiI3In0.Fjg8oqxF5xuk7fYw8Qx1K3yooiXoOc2w-bAYZSZnfGiZaFc3mi3rLVg2g_Uszc0jOJTIPEWW2jOTx31_jEA0kNqSOLqp4O14UAHnmLwaPsi3Uv0kaxY2jjl_bSAwk-kSdwboR5ej1vFPIwLgCQIyJDobyK-bKswczqAL4UH0mPauQ4hfFCa69nVf348_gYGW57yH97jFWmm_HNf1Bm1QG99PfwT2li3zd3G5bN5fCSMf0t86NsZOGfgiTIzODUwRE4Bp7YDFKFKBe60F7dSf5mBZz1UjmgOrOkrSx3YzLPGnNscIqD901IEFy_LOJ0ekMuzb0C__D--JcfNRHWP3nn50s393izvvOAyecypSYhwZFZI-qwBF2y4svKu9--WdocY6HZCu4OnxQBXh9USdLC3CacT6wE9JSyAPaFgnPA-SK_jf_cwfEyK-ud5L_l0ZJbo92sf6ciIN_L4Q-OxkfB_ltPwHBtxihAzgOPFK6a6Eso0meAw5EQIsDVxjnlb3ci0E8hmfAIxjcHDqieXjAEKNy7HblTUZNXa03HSwDjRx2NW_4aBaZrLAUfnxxfVZ84VQJcRhVO3XUvvnTTbdRkf-y633SMjd8MuClLRUVkRSYsw46pYtDJ3UZ1OV0tzNY82cuH3LBAme6uBVJG9KdE-4wJ-AgcW7qdEC9z5v93Y";
@@ -382,15 +394,17 @@ export default Access;
 //   client_secret: "de04a1d0279491f26d89",
 // });
 // const main = async () => {
-//   access.refreshToken({
-//     grant_type: "refresh_token",
-//     refresh_token: REFRESH_TOKEN1,
-//   });
+//   console.log(
+//     await access.refreshToken({
+//       grant_type: "refresh_token",
+//       refresh_token: REFRESH_TOKEN1,
+//     })
+//   );
 
-//   access.refreshToken({
-//     grant_type: "refresh_token",
-//     refresh_token: REFRESH_TOKEN2,
-//   });
+//   // access.refreshToken({
+//   //   grant_type: "refresh_token",
+//   //   refresh_token: REFRESH_TOKEN2,
+//   // });
 // };
 
 // main();
