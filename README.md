@@ -9,15 +9,23 @@ const commonInput = {
 };
 ```
 
-### Create a new client instance of Access
+### Create a new client instance of AccessBase or AccessAdvanced
 
 ```
-const client = new Access({
-  ...commonInput,
-  url: 'http://localhost:9111',
+const basic = new AccessBase({
+  application_id: "f8f5fc52-e6cf-42a9-b0a8-89f5c4e1a6e1",
+  organization_id: "e7c80e31-9ce2-47b7-b4de-bc6c95755ff0",
+  url: "http://wellteam.me",
 });
 
-// console.log({ client });
+const advaced = new AccessAdvanced({
+  application_id: "f8f5fc52-e6cf-42a9-b0a8-89f5c4e1a6e1",
+  organization_id: "e7c80e31-9ce2-47b7-b4de-bc6c95755ff0",
+  client_id: "def25c0319",
+  client_secret: "de04a1d0279491f26d89",
+  url: "http://wellteam.me",
+});
+
 
 ```
 
