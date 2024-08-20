@@ -13,7 +13,7 @@ export type BasicSDKInitInput = {
   url: string;
 };
 
-export type AdvancedSDKInitInput = {
+export type SDKInitInput = {
   client_id: string;
   client_secret: string;
   application_id: string;
@@ -192,7 +192,7 @@ export class AccessBase {
   }
 }
 export class Access extends AccessBase {
-  constructor(input: AdvancedSDKInitInput) {
+  constructor(input: SDKInitInput) {
     super(input);
   }
 

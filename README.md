@@ -1,4 +1,4 @@
-### Import type and client class
+### Import type and Access class
 
 ```
 import {
