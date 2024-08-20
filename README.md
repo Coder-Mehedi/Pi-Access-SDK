@@ -1,3 +1,16 @@
+### Import type and client class
+
+```
+import {
+  Access,
+  AccessBase,
+  LoginInput,
+  LogoutInput,
+  RefreshTokenInput,
+  RegisterInput,
+} from 'pi-access-sdk';
+```
+
 ### Store the common input in a variable
 
 ```
