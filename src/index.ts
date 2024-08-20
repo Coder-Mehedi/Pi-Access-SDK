@@ -7,7 +7,7 @@ export type CommonInput = {
   organization_id: string;
 };
 
-export type BasicSDKInitInput = {
+export type BaseSDKInitInput = {
   application_id: string;
   organization_id: string;
   url: string;
@@ -110,13 +110,13 @@ export type RefreshTokenRequest = {
 export class AccessBase {
   data: any;
   api: AxiosInstance;
-  input: BasicSDKInitInput | null = null;
+  input: BaseSDKInitInput | null = null;
   refreshTokensWithResponse: refreshTokensWithResponseType = {};
   refreshTokenQueue: RefreshTokenRequest[] = [];
 
   private static instance: AccessBase | null = null;
 
-  constructor(input: BasicSDKInitInput) {
+  constructor(input: BaseSDKInitInput) {
     // if (data.error) throw new Error(data.error.message);
 
     if (!AccessBase.instance) {
