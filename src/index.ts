@@ -187,6 +187,49 @@ export class AccessBase {
     }
   }
 
+  async forgetPasswordOTPSend(
+    forgetPasswordOTPSendInput: ForgetPasswordOTPSendInput
+  ) {
+    try {
+      const res = await this.api.post("/forget-password/otp/send", {
+        ...forgetPasswordOTPSendInput,
+        ...this.input,
+      });
+      return res.data;
+    } catch (error: any) {
+      // console.log(error);
+      throw error;
+    }
+  }
+
+  async forgetPasswordOTPVerify(
+    forgetPasswordOTPVerifyInput: ForgetPasswordOTPVerifyInput
+  ) {
+    try {
+      const res = await this.api.post("/forget-password/otp/verify", {
+        ...forgetPasswordOTPVerifyInput,
+        ...this.input,
+      });
+      return res.data;
+    } catch (error: any) {
+      // console.log(error);
+      throw error;
+    }
+  }
+
+  async forgetPassword(forgetPasswordInput: ForgetPasswordInput) {
+    try {
+      const res = await this.api.post(`/forget-password`, {
+        ...forgetPasswordInput,
+        ...this.input,
+      });
+      return res.data;
+    } catch (error: any) {
+      // console.log(error);
+      throw error;
+    }
+  }
+
   printCurrentRefreshTokens() {
     console.log(this.refreshTokensWithResponse);
   }
@@ -249,49 +292,6 @@ export class Access extends AccessBase {
       return res.data;
     } catch (error: any) {
       console.log(error);
-      throw error;
-    }
-  }
-
-  async forgetPasswordOTPSend(
-    forgetPasswordOTPSendInput: ForgetPasswordOTPSendInput
-  ) {
-    try {
-      const res = await this.api.post("/forget-password/otp/send", {
-        ...forgetPasswordOTPSendInput,
-        ...this.input,
-      });
-      return res.data;
-    } catch (error: any) {
-      // console.log(error);
-      throw error;
-    }
-  }
-
-  async forgetPasswordOTPVerify(
-    forgetPasswordOTPVerifyInput: ForgetPasswordOTPVerifyInput
-  ) {
-    try {
-      const res = await this.api.post("/forget-password/otp/verify", {
-        ...forgetPasswordOTPVerifyInput,
-        ...this.input,
-      });
-      return res.data;
-    } catch (error: any) {
-      // console.log(error);
-      throw error;
-    }
-  }
-
-  async forgetPassword(forgetPasswordInput: ForgetPasswordInput) {
-    try {
-      const res = await this.api.post(`/forget-password`, {
-        ...forgetPasswordInput,
-        ...this.input,
-      });
-      return res.data;
-    } catch (error: any) {
-      // console.log(error);
       throw error;
     }
   }
