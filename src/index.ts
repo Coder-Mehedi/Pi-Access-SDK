@@ -190,6 +190,19 @@ export class AccessBase {
     }
   }
 
+  async changePassword(changePasswordInput: ChangePasswordInput) {
+    try {
+      const res = await this.api.patch("/sdk/user/change-password", {
+        ...changePasswordInput,
+        ...this.input,
+      });
+      return res.data;
+    } catch (error: any) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async forgetPasswordOTPSend(
     forgetPasswordOTPSendInput: ForgetPasswordOTPSendInput
   ) {
@@ -282,19 +295,6 @@ export class Access extends AccessBase {
       return res.data;
     } catch (error: any) {
       // console.log(error);
-      throw error;
-    }
-  }
-
-  async changePassword(changePasswordInput: ChangePasswordInput) {
-    try {
-      const res = await this.api.patch("/sdk/user/change-password", {
-        ...changePasswordInput,
-        ...this.input,
-      });
-      return res.data;
-    } catch (error: any) {
-      console.log(error);
       throw error;
     }
   }
