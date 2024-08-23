@@ -11,6 +11,8 @@ export type BaseSDKInitInput = {
   application_id: string;
   organization_id: string;
   url: string;
+  client_id?: string;
+  client_secret?: string;
 };
 
 export type SDKInitInput = {
