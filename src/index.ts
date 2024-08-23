@@ -72,6 +72,7 @@ export type RefreshTokenInput = {
 
 export type ChangePasswordInput = {
   user_id: string;
+  access_secret: string;
   current_password: string;
   new_password: string;
 };
